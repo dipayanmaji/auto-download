@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Download</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            color: white;
+            text-align: center;
+        }
+
+        #message {
+            font-size: 24px;
+        }
+
+        #timer {
+            font-size: 48px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="message">Your download will start automatically in <span id="timer">5</span> seconds...</div>
+
+    <script>
+        // Set the initial time limit (in seconds)
+        const initialTimeLimit = 5; // 5 seconds
+        let timeRemaining = initialTimeLimit;
+
+        // The URL of the PDF file to be downloaded
+        const fileUrl = './img.jpg';
+
+        // The name of the file to be saved
+        const fileName = 'downloaded-file'; // Replace with the desired file name
+
+        // Function to trigger the download
+        function triggerDownload(url, name) {
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    const blobUrl = URL.createObjectURL(blob);
+                    const anchor = document.createElement('a');
+                    anchor.href = blobUrl;
+                    anchor.download = name;
+                    document.body.appendChild(anchor);
+                    anchor.click();
+                    document.body.removeChild(anchor);
+                    URL.revokeObjectURL(blobUrl);
+                })
+                .catch(console.error);
+        }
+
+        // Function to update the countdown timer
+        function updateTimer() {
+            if (timeRemaining > 0) {
+                timeRemaining -= 1;
+                document.getElementById('timer').textContent = timeRemaining;
+            } else {
+                clearInterval(timerInterval);
+                triggerDownload(fileUrl, fileName);
+                document.getElementById('message').textContent = 'Your download should start now!';
+            }
+        }
+
+        // Set an interval to update the timer every second
+        const timerInterval = setInterval(updateTimer, 1000);
+
+        // Trigger the download after the initial time limit
+        setTimeout(() => {
+            clearInterval(timerInterval);
+            triggerDownload(fileUrl, fileName);
+            document.getElementById('message').textContent = 'Your download should start now!';
+        }, initialTimeLimit * 1000);
+    </script>
+</body>
+
+</html>
